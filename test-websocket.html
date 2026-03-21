@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test WebSocket Driver Location</title>
+    <!-- Thư viện SockJS và STOMP -->
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .box { border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; border-radius: 5px; }
+        input { margin: 5px 0; padding: 8px; width: 300px; display: block; }
+        button { padding: 10px 15px; background: #28a745; color: white; border: none; cursor: pointer; border-radius: 4px; }
+        button.send { background: #007bff; }
+        #log { background: #f4f4f4; padding: 10px; height: 150px; overflow-y: scroll; border: 1px solid #ddd; }
+    </style>
+</head>
+<body>
+
+    <h2>Ride-Hailing: Test Gửi Tọa độ Tài xế (WebSocket)</h2>
+
+    <div class="box">
+        <h3>1. Kết nối tới Server</h3>
+        <button onclick="connect()">Connect WebSocket</button>
+        <span id="status" style="color: red; font-weight: bold; margin-left: 10px;">Disconnected</span>
+    </div>
+
+    <div class="box">
+        <h3>2. Gửi Tọa Độ Hiện Tại</h3>
+        <input type="text" id="driverId" placeholder="Nhập ID tài xế (UUID từ DB hoặc bất kỳ UUID nào)" value="123e4567-e89b-12d3-a456-426614174000">
+        <input type="text" id="lat" placeholder="Latitude (Vĩ độ - Vd: 21.0285)" value="21.0285">
+        <input type="text" id="lon" placeholder="Longitude (Kinh độ - Vd: 105.8542)" value="105.8542">
+        <button class="send" onclick="sendLocation()">Bắn Tọa Độ Lên Server 🚀</button>
+    </div>
+
+    <h3>Logs:</h3>
+    <div id="log"></div>
+
+    <script>
+        var stompClient = null;
+
+        function logMessage(message) {
+            var logDiv = document.getElementById('log');
+            logDiv.innerHTML += '<p>' + message + '</p>';
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function connect() {
+            var socket = new SockJS('http://localhost:8080/ws-ridehailing');
+            stompClient = Stomp.over(socket);
+            
+            stompClient.connect({}, function (frame) {
+                document.getElementById('status').innerText = "Connected 🟢";
+                document.getElementById('status').style.color = "green";
+                logMessage("Connected to Server: " + frame);
+            }, function(error) {
+                logMessage("Connection error: " + error);
+            });
+        }
+
+        function sendLocation() {
+            if (!stompClient || !stompClient.connected) {
+                alert("Hãy bấm nút Connect trước!");
+                return;
+            }
+
+            var driverId = document.getElementById('driverId').value;
+            var lat = document.getElementById('lat').value;
+            var lon = document.getElementById('lon').value;
+
+            var payload = JSON.stringify({
+                'driverId': driverId,
+                'lat': parseFloat(lat),
+                'lng': parseFloat(lon)
+            });
+
+            // Gửi message vào endpoint /app/driver/location
+            stompClient.send("/app/driver/location", {}, payload);
+            logMessage("Đã gửi tọa độ: " + payload);
+        }
+    </script>
+</body>
+</html>

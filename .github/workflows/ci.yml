@@ -1,0 +1,40 @@
+name: Ride-Hailing Backend CI/CD 🚀
+
+# 1. KHI NÀO ROBOT THỨC DẬY?
+# Trả lời: Bất cứ khi nào chủ nhân gõ "git push" cập nhật code lên nhánh "main"
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  automation-pipeline:
+    # 2. KHÔNG GIAN LÀM VIỆC CỦA ROBOT
+    # GitHub sẽ cấp miễn phí cho em 1 con máy ảo chạy Linux Ubuntu siêu mạnh
+    runs-on: ubuntu-latest
+
+    steps:
+      # BƯỚC A: Lấy code của em từ GitHub đặt vào máy ảo Linux
+      - name: Tải Mã Nguồn Về Máy Ảo
+        uses: actions/checkout@v4
+
+      # BƯỚC B: Cài đặt JDK 17 để chuẩn bị môi trường
+      - name: Cài Đặt Java 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
+          cache: maven # 🌟 Ngạc nhiên chưa, Robot cũng biết mượn bài học Cache của Docker hồi nãy ở đây này!
+
+      # BƯỚC C: Chạy Unit Test (Bài 2)
+      # Nếu Test bị ĐỎ, Robot sẽ chửi ầm lên gửi email cho em và HUỶ BỎ tát cả các bước sau.
+      - name: Chạy Kịch Bản Unit Test (Automation Test) 🧪
+        run: mvn test
+
+      # BƯỚC D: Đóng Gói (Bài 5)
+      # Nếu Test XANH, Robot tự động gõ lệnh Docker Build mình vừa học.
+      - name: Đóng gói Docker Image 🐳
+        run: docker build -t ride-hailing-backend .
+
+      # BƯỚC E: Báo Cáo
+      - name: Hoàn Tất!
+        run: echo "🎉 Mọi bài Test đều xanh! Docker đã đóng gói xong! Sãn sàng tung ra thị trường!"
