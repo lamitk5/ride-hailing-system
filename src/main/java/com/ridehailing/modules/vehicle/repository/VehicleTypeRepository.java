@@ -6,4 +6,5 @@ import java.util.UUID;
 
 @Repository
 public interface VehicleTypeRepository extends JpaRepository<VehicleType, UUID> {
+    java.util.Optional<VehicleType> findByName(String name);
 }

@@ -1,0 +1,78 @@
+plugins {
+    alias(libs.plugins.android.application)
+}
+
+android {
+    namespace 'com.app.myapplication'
+    compileSdk 36
+
+    defaultConfig {
+        applicationId "com.app.myapplication"
+        minSdk 26
+        targetSdk 34
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    flavorDimensions "role"
+    productFlavors {
+        user {
+            dimension "role"
+            applicationIdSuffix ".user"
+            versionNameSuffix "-user"
+            resValue "string", "app_name_flavor", "GoDrive"
+        }
+        driver {
+            dimension "role"
+            applicationIdSuffix ".driver"
+            versionNameSuffix "-driver"
+            resValue "string", "app_name_flavor", "GoDrive Tài Xế"
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+    buildFeatures {
+        viewBinding true
+        buildConfig true
+    }
+}
+
+dependencies {
+    implementation libs.appcompat
+    implementation libs.material
+    implementation libs.activity
+    implementation libs.constraintlayout
+
+    // Retrofit + OkHttp (Spring Boot REST API)
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.12.0'
+    implementation 'com.google.code.gson:gson:2.10.1'
+
+    // SwipeRefresh
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+// Retrofit
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0' // Parse JSON sang Object
+
+    // OkHttp cho logging & Interceptor (để gắn JWT Token)
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.11.0'
+
+    // Coroutines (để xử lý bất đồng bộ, không làm đơ giao diện)
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
+    testImplementation libs.junit
+    androidTestImplementation libs.ext.junit
+    androidTestImplementation libs.espresso.core
+}

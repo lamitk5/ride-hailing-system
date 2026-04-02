@@ -1,5 +1,7 @@
 package com.ridehailing.modules.driver.controller;
 
+import com.ridehailing.config.security.JwtTokenProvider;
+import com.ridehailing.modules.account.dto.LoginResponseDTO;
 import com.ridehailing.modules.driver.dto.DriverRegistrationRequest;
 import com.ridehailing.modules.driver.entity.Driver;
 import com.ridehailing.modules.driver.service.DriverService;
@@ -16,10 +18,18 @@ import org.springframework.web.bind.annotation.RestController;
 public class DriverController {
 
     private final DriverService driverService;
+    private final JwtTokenProvider tokenProvider;
 
     @PostMapping("/register")
-    public ResponseEntity<Driver> registerDriver(@RequestBody DriverRegistrationRequest request) {
+    public ResponseEntity<LoginResponseDTO> registerDriver(@RequestBody DriverRegistrationRequest request) {
         Driver driver = driverService.registerDriver(request);
-        return ResponseEntity.ok(driver);
+        String token = tokenProvider.generateToken(driver.getAccount().getPhoneNumber(), driver.getAccount().getRole());
+        return ResponseEntity.ok(LoginResponseDTO.builder()
+                .token(token)
+                .userId(driver.getId().toString())
+                .role(driver.getAccount().getRole())
+                .fullName(driver.getFullName())
+                .phoneNumber(driver.getAccount().getPhoneNumber())
+                .build());
     }
 }

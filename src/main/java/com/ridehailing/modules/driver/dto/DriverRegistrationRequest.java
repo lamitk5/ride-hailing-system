@@ -14,5 +14,5 @@ public class DriverRegistrationRequest {
     // Thông tin xe (Vehicle)
     private String licensePlate;
     private String brandModel;
-    private UUID vehicleTypeId;
+    private String vehicleType;
 }

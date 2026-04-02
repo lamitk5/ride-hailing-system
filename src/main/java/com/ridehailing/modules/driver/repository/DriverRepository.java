@@ -9,4 +9,5 @@ import java.util.UUID;
 @Repository
 public interface DriverRepository extends JpaRepository<Driver, UUID> {
     boolean existsByIdentityCard(String identityCard);
+    java.util.Optional<Driver> findByAccount(com.ridehailing.modules.account.entity.Account account);
 }

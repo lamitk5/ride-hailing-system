@@ -9,6 +9,7 @@ import com.ridehailing.modules.driver.repository.DriverRepository;
 import com.ridehailing.modules.vehicle.entity.Vehicle;
 import com.ridehailing.modules.vehicle.entity.VehicleType;
 import com.ridehailing.modules.vehicle.repository.VehicleRepository;
+import com.ridehailing.modules.vehicle.repository.VehicleTypeRepository;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,6 +24,7 @@ public class DriverService {
     private final AccountRepository accountRepository;
     private final PasswordEncoder passwordEncoder;
     private final VehicleRepository vehicleRepository;
+    private final VehicleTypeRepository vehicleTypeRepository;
     private final EntityManager entityManager;
 
     @Transactional
@@ -53,7 +55,17 @@ public class DriverService {
                 .build();
         driver = driverRepository.save(driver);
 
-        VehicleType type = entityManager.getReference(VehicleType.class, request.getVehicleTypeId());
+        VehicleType type = vehicleTypeRepository.findByName(request.getVehicleType())
+                .orElseGet(() -> {
+                    VehicleType newType = VehicleType.builder()
+                            .name(request.getVehicleType())
+                            .baseFare(java.math.BigDecimal.valueOf(15000))
+                            .pricePerKm(java.math.BigDecimal.valueOf(5000))
+                            .isActive(true)
+                            .build();
+                    return vehicleTypeRepository.save(newType);
+                });
+
         Vehicle vehicle = Vehicle.builder()
                 .licensePlate(request.getLicensePlate())
                 .brandModel(request.getBrandModel())
